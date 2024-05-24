@@ -1,0 +1,543 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <math.h>
+#include <time.h>
+#include <stdbool.h>
+#define MAX_BUFFER 1000 
+#define MAX_ITEM_NAME 50
+#define MAX_ORDER_ITEMS 10
+#define MAX_NAME_LENGTH 100
+#define NUM_TAVOLI 6
+
+typedef struct {
+    char name[MAX_ITEM_NAME];
+    double price;
+} MenuItem;
+
+bool isLeapYear(int year) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
+bool isValidDate(int day, int month, int year) {
+    if (year < 1900 || year > 2100) return false;
+    if (month < 1 || month > 12) return false;
+    int daysInMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (isLeapYear(year) && month == 2) {
+        daysInMonth[1] = 29;
+    }
+    return day >= 1 && day <= daysInMonth[month - 1];
+}
+
+void controllaTavoliDisponibili(int giorno, int mese, int anno, bool tavoliDisponibili[]) {
+    FILE *file = fopen("C:/Users/lenov/Desktop/ristorante/prenotazioni.txt", "r");
+    if (file == NULL) {
+        return; 
+    }
+    int d, m, y, t, posti;
+    char nome[MAX_NAME_LENGTH];
+    while (fscanf(file, "Data: %d/%d/%d, Tavolo: %d, Posti: %d, Nome: %[^\n]\n", &d, &m, &y, &t, &posti, nome) == 6) {
+        if (d == giorno && m == mese && y == anno) {
+            tavoliDisponibili[t - 1] = false;
+        }
+    }
+    fclose(file);
+}
+
+int main(int argc, char *argv[]) {
+	int i,j,v,c,f;
+	start:
+	system("cls");
+	printf("\t\t\t   ------------------------------------------\n\t\t\t  /                                          \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\(       RISTORANTE CARBONARA CON PANNA       )\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                                          /\n\t\t\t   ------------------------------------------\n\n\n\n)  Cliccare 1 per il Menu'.\n\n)  Cliccare 2 per la Prenotazione dei tavoli.\n\n)  Cliccare 3 per vedere i Miei Ordini.\n\n)  Cliccare 4 per le Recensioni.\n\n)  Cliccare 5 per vedere i Crediti.\n\n\n\n)  Cliccare 6 per chiudere il Programma\n\n\n------------------------------------------------------------------------------------------------\n\n\t\t\t     Numero di telefono: +39 3409876543\n\t\t\tIndirizzo e-mail: carbonaraconpanna@gmail.com\n\t\t\t      Indirizzo: Via della Liberta' 23\n\n");
+	scanf("%d", &v);
+	if(v==1){
+		for(i=0;i!=10000;i++){
+			system("cls");
+			FILE *file = fopen("C:\\Users\\lenov\\Desktop\\ristorante\\menu.txt", "r");
+    		if (file == NULL) {
+        		printf("Impossibile aprire il file.\n");
+        		return 1;
+    		}
+    		char buffer[100]; 
+    		while (fgets(buffer, 100, file) != NULL) {
+        		printf("%s", buffer); 
+    		}
+	   		fclose(file);
+			printf("\n\n\n\n\n)  Cliccare 0 per tornare alla pagina principale.\n\n");
+			scanf("%d", &c);
+			if(c==0){
+				goto start;
+			}
+		}
+	}
+	if(v==2){
+		for(i=0;i!=10000;i++){
+			system("cls");
+			printf("\t\t\t   -------------------------------\n\t\t\t  /                               \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\|       PRENOTAZIONE TAVOLI       |\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                               /\n\t\t\t   -------------------------------\n\n\n\n");
+			int giorno, mese, anno;
+    		int tavolo;
+    		int posti;
+    		int i;
+    		char nome[MAX_NAME_LENGTH];
+    		int postiTavoli[] = {2, 4, 6, 8, 10, 12};
+    		bool tavoliDisponibili[NUM_TAVOLI];
+			printf(")  Cliccare 1 se si vuole prenotare\n\n)  Cliccare 0 per tornare alla pagina principale.\n\n");
+			scanf("%d", &c);
+			if(c==0){
+				goto start;
+			}
+			if(c==1){
+				system("cls");	
+				printf("\t\t\t   -------------------------------\n\t\t\t  /                               \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\|       PRENOTAZIONE TAVOLI       |\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                               /\n\t\t\t   -------------------------------\n\n\n\n");
+    			printf("\nInserisca la data di prenotazione (gg/mm/aaaa): \n\n");
+    			scanf("%d/%d/%d", &giorno, &mese, &anno);
+    			while (!isValidDate(giorno, mese, anno)) {
+        			printf("Data non valida. Inserisci di nuovo la data di prenotazione (gg/mm/aaaa): ");
+        			scanf("%d/%d/%d", &giorno, &mese, &anno);
+    			}
+    			for (i = 0; i < NUM_TAVOLI; i++) {
+    			    tavoliDisponibili[i] = true;
+    			}
+    			controllaTavoliDisponibili(giorno, mese, anno, tavoliDisponibili);
+    			printf("\n\nTavoli per il %02d/%02d/%04d:\n", giorno, mese, anno);
+    			for (i = 0; i < NUM_TAVOLI; i++) {
+    			    if (tavoliDisponibili[i]) {
+   						printf("- Tavolo %d: %d posti\n", i + 1, postiTavoli[i]);
+    				} else {
+		    	        printf("- Tavolo %d: %d posti (gia' occupato)\n", i + 1, postiTavoli[i]);
+		    	    }
+		    	}
+			    printf("\nInserisci il numero del tavolo da prenotare (1-6): ");
+			    scanf("%d", &tavolo);
+			    while (tavolo < 1 || tavolo > 6 || !tavoliDisponibili[tavolo - 1]) {
+			        if (tavolo < 1 || tavolo > 6) {
+			            printf("Numero del tavolo non valido. Inserisci un numero tra 1 e 6: ");
+		    	    } else if (!tavoliDisponibili[tavolo - 1]) {
+		 	     	    printf("Tavolo %d non disponibile. Inserisci un altro numero tra 1 e 6: ", tavolo);
+			        }
+		       		scanf("%d", &tavolo);
+ 		  		}
+		 	   posti = postiTavoli[tavolo - 1];
+
+			    printf("Inserisci il nome della prenotazione: ");
+			    scanf(" %[^\n]", nome);  
+		
+				FILE *file = fopen("C:/Users/lenov/Desktop/ristorante/prenotazioni.txt", "a");
+				if (file == NULL) {
+			        perror("Errore nell'apertura del file");
+			        exit(EXIT_FAILURE);
+	 			}
+		    	fprintf(file, "Data: %02d/%02d/%04d, Tavolo: %d, Posti: %d, Nome: %s\n", 
+		    	giorno, mese, anno, tavolo, posti, nome);
+				fclose(file);
+				system("cls");
+				printf("\t\t\t   -------------------------------\n\t\t\t  /                               \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\|       PRENOTAZIONE TAVOLI       |\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                               /\n\t\t\t   -------------------------------\n\n\n\n");
+				printf("Prenotazione salvata con successo!\n");
+				sleep(2);
+				system("cls");
+				printf("\t\t\t   -------------------------------\n\t\t\t  /                               \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\|       PRENOTAZIONE TAVOLI       |\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                               /\n\t\t\t   -------------------------------\n\n\n\n");
+				printf("\n\n\n)  Cliccare 0 per tornare alla pagina principale.\n\n");
+				scanf("%d", &c);
+				if(c==0){
+					goto start;
+				}
+			}
+		}
+}
+	if(v==3){
+		for(i=0;i!=10000;i++){
+			system("cls");
+			printf("\t\t\t   -----------------------\n\t\t\t  /                       \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\|       ORDINAZIONI       |\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                       /\n\t\t\t   -----------------------\n\n");
+			printf("\n\n)  Cliccare 1 se vuole ordinare.\n\n)  Cliccare 2 se si vuole vedere lo storico degli ordini\n\n)  Cliccare 0 se si vuole tornare alla pagina principale.\n\n\n");
+			scanf("%d", &f);
+			if(f==1){
+				system("cls");
+				MenuItem antipasti[] = {
+       			{"1. Bruschette al pomodoro", 7.50},
+        		{"2. Tortino di verdure", 8.00},
+        		{"3. Crocchette di patate", 6.50},
+    	  		{"4. Tartare di fassona", 10.00},
+    	    	{"5. Tartare di salmone", 12.00}
+    			};
+    			int antipastiSize = sizeof(antipasti) / sizeof(antipasti[0]);
+   	 			MenuItem primiPiatti[] = {
+    			    {"6. Pasta allo scoglio", 12.00},
+    			    {"7. Carbonara", 10.00},
+    			    {"8. Cacio e pepe", 9.00},
+    			    {"9. Lasagne della nonna", 11.00}
+    			};
+    			int primiPiattiSize = sizeof(primiPiatti) / sizeof(primiPiatti[0]);
+    			MenuItem secondiDiPesce[] = {
+    			    {"10. Frittura mista", 14.00},
+    			    {"11. Tonno alla griglia", 15.00},
+    			    {"12. Sogliola al limone", 16.00}
+    			};
+    			int secondiDiPesceSize = sizeof(secondiDiPesce) / sizeof(secondiDiPesce[0]);
+    			MenuItem secondiDiCarne[] = {
+    			    {"13. Cotoletta alla milanese", 13.00},
+    			    {"14. Filetto di manzo alla griglia", 18.00},
+    			    {"15. Spezzatino di agnello", 17.00}
+    			};
+    			int secondiDiCarneSize = sizeof(secondiDiCarne) / sizeof(secondiDiCarne[0]);
+    			MenuItem contorni[] = {
+    			    {"16. Patatine fritte", 4.00},
+    			    {"17. Spinaci", 5.00},
+    			    {"18. Patate al forno", 4.50},
+    			    {"19. Insalata", 4.00}
+    			};
+    			int contorniSize = sizeof(contorni) / sizeof(contorni[0]);
+    			MenuItem dolci[] = {
+    			    {"20. Tortino della nonna", 6.00},
+   		    		{"21. Meringata", 7.00},
+    			    {"22. Tiramisu", 6.50}
+    			};
+    			int dolciSize = sizeof(dolci) / sizeof(dolci[0]);	
+    			MenuItem bibite[] = {
+    			    {"23. Acqua (Naturale, Frizzante)", 2.00},
+    			    {"24. Coca-Cola", 2.50},
+    			    {"25. Fanta", 2.50},
+    			    {"26. EstaThe", 2.50},
+    			    {"27. Vino (Bianco, Rosso)", 15.00}
+    			};
+    			int bibiteSize = sizeof(bibite) / sizeof(bibite[0]);
+    			FILE *orderFile = fopen("C:/Users/lenov/Desktop/ristorante/ordini.txt", "a"); // Modalità "append"
+    			if (orderFile == NULL) {
+    			    printf("Impossibile aprire il file degli ordini.\n");
+    			    return 1;
+    			}
+    			printf("\t\t\t---------\n\t\t\t| MENU' |\n\t\t\t---------\n\n");
+    			printf("\n\t\t\tANTIPASTI:\n\n");
+    			for (i = 0; i < antipastiSize; i++) {
+    			    printf("- %s: Prezzo %.2lf euro\n", antipasti[i].name, antipasti[i].price);
+    			}
+    			printf("\n\n\t\t      PRIMI PIATTI:\n\n");
+    			for (i = 0; i < primiPiattiSize; i++) {
+    			    printf("- %s: Prezzo %.2lf euro\n", primiPiatti[i].name, primiPiatti[i].price);
+    			}
+    			printf("\n\n\t\t   SECONDI PIATTI DI PESCE:\n\n");
+    			for (i = 0; i < secondiDiPesceSize; i++) {
+    			    printf("- %s: Prezzo %.2lf euro\n", secondiDiPesce[i].name, secondiDiPesce[i].price);
+    			}
+    			printf("\n\n\t\t   SECONDI PIATTI DI CARNE:\n\n");
+    			for (i = 0; i < secondiDiCarneSize; i++) {
+    			    printf("- %s: Prezzo %.2lf euro\n", secondiDiCarne[i].name, secondiDiCarne[i].price);
+   				}
+    			printf("\n\n\t\t       CONTORNI:\n\n");
+    			for (i = 0; i < contorniSize; i++) {
+    			    printf("- %s: Prezzo %.2lf euro\n", contorni[i].name, contorni[i].price);
+    			}
+    			printf("\n\n\t\t\tDOLCI:\n\n");
+   				for (i = 0; i < dolciSize; i++) {
+    			    printf("- %s: Prezzo %.2lf euro\n", dolci[i].name, dolci[i].price);
+    			}
+    			printf("\n\n\t\t\tBIBITE:\n\n");
+    			for (i = 0; i < bibiteSize; i++) {
+    			    printf("- %s: Prezzo %.2lf euro\n", bibite[i].name, bibite[i].price);
+    			}
+    			fprintf(orderFile, "Ordine:\n\n");
+    			double total = 0.0;
+    			int choice;
+    			int quantity;
+    			do {
+    			    printf("\n\n)  Scegliere un articolo dal menu' (1-%d):\n\n)  Oppure cliccare 0 per terminare l'ordine.\n\n", antipastiSize + primiPiattiSize + secondiDiPesceSize + secondiDiCarneSize + contorniSize + dolciSize + bibiteSize);
+    			    scanf("%d", &choice);
+    			    if (choice >= 1 && choice <= antipastiSize + primiPiattiSize + secondiDiPesceSize + secondiDiCarneSize + contorniSize + dolciSize + bibiteSize) {
+    			        printf("\nQuantita: ");
+    			        scanf("%d", &quantity);
+    			        if (choice <= antipastiSize) {
+   		    	        fprintf(orderFile, "%s - %d x %.2lf EUR\n", antipasti[choice - 1].name, quantity, antipasti[choice - 1].price);
+    			            total += quantity * antipasti[choice - 1].price;
+    			        } else if (choice <= antipastiSize + primiPiattiSize) {
+    			            fprintf(orderFile, "%s - %d x %.2lf EUR\n", primiPiatti[choice - 1 - antipastiSize].name, quantity, primiPiatti[choice - 1 - antipastiSize].price);
+    			            total += quantity * primiPiatti[choice - 1 - antipastiSize].price;
+    			        } else if (choice <= antipastiSize + primiPiattiSize + secondiDiPesceSize) {
+    			            fprintf(orderFile, "%s - %d x %.2lf EUR\n", secondiDiPesce[choice - 1 - antipastiSize - primiPiattiSize].name, quantity, secondiDiPesce[choice - 1 - antipastiSize - primiPiattiSize].price);
+    			            total += quantity * secondiDiPesce[choice - 1 - antipastiSize - primiPiattiSize].price;
+    			        } else if (choice <= antipastiSize + primiPiattiSize + secondiDiPesceSize + secondiDiCarneSize) {
+    			            fprintf(orderFile, "%s - %d x %.2lf EUR\n", secondiDiCarne[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize].name, quantity, secondiDiCarne[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize].price);
+    			            total += quantity * secondiDiCarne[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize].price;
+    			        } else if (choice <= antipastiSize + primiPiattiSize + secondiDiPesceSize + secondiDiCarneSize + contorniSize) {
+    			            fprintf(orderFile, "%s - %d x %.2lf EUR\n", contorni[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize].name, quantity, contorni[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize].price);
+    			            total += quantity * contorni[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize].price;
+    			        } else if (choice <= antipastiSize + primiPiattiSize + secondiDiPesceSize + secondiDiCarneSize + contorniSize + dolciSize) {
+    			            fprintf(orderFile, "%s - %d x %.2lf EUR\n", dolci[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize].name, quantity, dolci[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize].price);
+    			            total += quantity * dolci[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize].price;
+    			        } else {
+    			            fprintf(orderFile, "%s - %d x %.2lf EUR\n", bibite[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize - dolciSize].name, quantity, bibite[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize - dolciSize].price);
+    			            total += quantity * bibite[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize - dolciSize].price;
+    			        }
+    			    }
+    			} while (choice != 0);
+    			system("cls");
+				fprintf(orderFile, "\nTotale: %.2lf EUR\n", total);
+				printf("\t\t\t   -----------------------\n\t\t\t  /                       \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\|       ORDINAZIONI       |\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                       /\n\t\t\t   -----------------------\n\n\n\n");
+				printf("\n\nTOTALE: %.2lf EUR\n\n\n", total);
+    			fprintf(orderFile, "------------------------------------\n"); 
+    			fclose(orderFile);
+    			printf("Ordine effettuato con successo. Grazie per aver ordinato!\n");
+    			sleep(3);
+    			system("cls");
+			}
+			if(f==2){
+				system("cls");
+				FILE *file = fopen("C:\\Users\\lenov\\Desktop\\ristorante\\ordini.txt", "r");
+    			if (file == NULL) {
+        			printf("Impossibile aprire il file.\n");
+        			return 1;
+    			}
+    			char buffer[100]; 
+    			while (fgets(buffer, 100, file) != NULL) {
+        			printf("%s", buffer); 
+    			}
+	   			fclose(file);
+	   			printf("\n\n\n\n\n)  Cliccare 1 se si vuole ordinare.\n\n)  Cliccare 0 per tornare alla pagina principale.\n\n");
+				scanf("%d", &c);
+				if(c==0){
+					goto start;
+				}
+				if (c==1){
+					system("cls");
+					MenuItem antipasti[] = {
+	      			{"1. Bruschette al pomodoro", 7.50},
+    	    		{"2. Tortino di verdure", 8.00},
+        			{"3. Crocchette di patate", 6.50},
+    	  			{"4. Tartare di fassona", 10.00},
+    	    		{"5. Tartare di salmone", 12.00}
+    				};
+    				int antipastiSize = sizeof(antipasti) / sizeof(antipasti[0]);
+   	 				MenuItem primiPiatti[] = {
+    				    {"6. Pasta allo scoglio", 12.00},
+    				    {"7. Carbonara", 10.00},
+    				    {"8. Cacio e pepe", 9.00},
+    				    {"9. Lasagne della nonna", 11.00}
+    				};
+    				int primiPiattiSize = sizeof(primiPiatti) / sizeof(primiPiatti[0]);
+    				MenuItem secondiDiPesce[] = {
+    					    {"10. Frittura mista", 14.00},
+    				    {"11. Tonno alla griglia", 15.00},
+    				    {"12. Sogliola al limone", 16.00}
+    				};
+    				int secondiDiPesceSize = sizeof(secondiDiPesce) / sizeof(secondiDiPesce[0]);
+    				MenuItem secondiDiCarne[] = {
+    				    {"13. Cotoletta alla milanese", 13.00},
+    				    {"14. Filetto di manzo alla griglia", 18.00},
+    				    {"15. Spezzatino di agnello", 17.00}
+    				};
+    				int secondiDiCarneSize = sizeof(secondiDiCarne) / sizeof(secondiDiCarne[0]);
+    				MenuItem contorni[] = {
+    			    	{"16. Patatine fritte", 4.00},
+    				   	{"17. Spinaci", 5.00},
+    				    {"18. Patate al forno", 4.50},
+    				    {"19. Insalata", 4.00}
+    				};
+    				int contorniSize = sizeof(contorni) / sizeof(contorni[0]);
+    				MenuItem dolci[] = {
+    				    {"20. Tortino della nonna", 6.00},
+   		    			{"21. Meringata", 7.00},
+    				    {"22. Tiramisu", 6.50}
+    				};
+    				int dolciSize = sizeof(dolci) / sizeof(dolci[0]);	
+    				MenuItem bibite[] = {
+    				    {"23. Acqua (Naturale, Frizzante)", 2.00},
+    				    {"24. Coca-Cola", 2.50},
+    				    {"25. Fanta", 2.50},
+    				    {"26. EstaThe", 2.50},
+    				    {"27. Vino (Bianco, Rosso)", 15.00}
+    				};
+    				int bibiteSize = sizeof(bibite) / sizeof(bibite[0]);
+    				FILE *orderFile = fopen("C:/Users/lenov/Desktop/ristorante/ordini.txt", "a"); // Modalità "append"
+    				if (orderFile == NULL) {
+    				    printf("Impossibile aprire il file degli ordini.\n");
+    				    return 1;
+    				}
+    				printf("\t\t\t---------\n\t\t\t| MENU' |\n\t\t\t---------\n\n");
+    				printf("\n\t\t\tANTIPASTI:\n\n");
+    				for (i = 0; i < antipastiSize; i++) {
+    				    printf("- %s: Prezzo %.2lf euro\n", antipasti[i].name, antipasti[i].price);
+    				}
+    				printf("\n\n\t\t      PRIMI PIATTI:\n\n");
+    				for (i = 0; i < primiPiattiSize; i++) {
+    				    printf("- %s: Prezzo %.2lf euro\n", primiPiatti[i].name, primiPiatti[i].price);
+    				}
+    				printf("\n\n\t\t   SECONDI PIATTI DI PESCE:\n\n");
+    				for (i = 0; i < secondiDiPesceSize; i++) {
+    				    printf("- %s: Prezzo %.2lf euro\n", secondiDiPesce[i].name, secondiDiPesce[i].price);
+    				}
+    				printf("\n\n\t\t   SECONDI PIATTI DI CARNE:\n\n");
+    				for (i = 0; i < secondiDiCarneSize; i++) {
+    				    printf("- %s: Prezzo %.2lf euro\n", secondiDiCarne[i].name, secondiDiCarne[i].price);
+   					}
+    				printf("\n\n\t\t       CONTORNI:\n\n");
+    				for (i = 0; i < contorniSize; i++) {
+    				    printf("- %s: Prezzo %.2lf euro\n", contorni[i].name, contorni[i].price);
+    				}
+    				printf("\n\n\t\t\tDOLCI:\n\n");
+   					for (i = 0; i < dolciSize; i++) {
+    				    printf("- %s: Prezzo %.2lf euro\n", dolci[i].name, dolci[i].price);
+    				}
+    				printf("\n\n\t\t\tBIBITE:\n\n");
+    				for (i = 0; i < bibiteSize; i++) {
+    				    printf("- %s: Prezzo %.2lf euro\n", bibite[i].name, bibite[i].price);
+    				}
+    				fprintf(orderFile, "Ordine:\n\n");
+    				double total = 0.0;
+    				int choice;
+    				int quantity;
+    				do {
+    				    printf("\n\n)  Scegliere un articolo dal menu' (1-%d):\n\n)  Oppure cliccare 0 per terminare l'ordine.\n\n", antipastiSize + primiPiattiSize + secondiDiPesceSize + secondiDiCarneSize + contorniSize + dolciSize + bibiteSize);
+    				    scanf("%d", &choice);
+    				    if (choice >= 1 && choice <= antipastiSize + primiPiattiSize + secondiDiPesceSize + secondiDiCarneSize + contorniSize + dolciSize + bibiteSize) {
+    					    printf("\nQuantita: ");
+    						scanf("%d", &quantity);
+    			    	    if (choice <= antipastiSize) {
+   		    	    		    fprintf(orderFile, "%s - %d x %.2lf EUR\n", antipasti[choice - 1].name, quantity, antipasti[choice - 1].price);
+    			    	        total += quantity * antipasti[choice - 1].price;
+    			    	    } else if (choice <= antipastiSize + primiPiattiSize) {
+    			    	        fprintf(orderFile, "%s - %d x %.2lf EUR\n", primiPiatti[choice - 1 - antipastiSize].name, quantity, primiPiatti[choice - 1 - antipastiSize].price);
+    			    	        total += quantity * primiPiatti[choice - 1 - antipastiSize].price;
+    			    	    } else if (choice <= antipastiSize + primiPiattiSize + secondiDiPesceSize) {
+    			    	        fprintf(orderFile, "%s - %d x %.2lf EUR\n", secondiDiPesce[choice - 1 - antipastiSize - primiPiattiSize].name, quantity, secondiDiPesce[choice - 1 - antipastiSize - primiPiattiSize].price);
+    			    	        total += quantity * secondiDiPesce[choice - 1 - antipastiSize - primiPiattiSize].price;
+    			    	    } else if (choice <= antipastiSize + primiPiattiSize + secondiDiPesceSize + secondiDiCarneSize) {
+    			    	        fprintf(orderFile, "%s - %d x %.2lf EUR\n", secondiDiCarne[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize].name, quantity, secondiDiCarne[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize].price);
+    			    	        total += quantity * secondiDiCarne[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize].price;
+    			    	    } else if (choice <= antipastiSize + primiPiattiSize + secondiDiPesceSize + secondiDiCarneSize + contorniSize) {
+    			    	        fprintf(orderFile, "%s - %d x %.2lf EUR\n", contorni[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize].name, quantity, contorni[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize].price);
+    			    	        total += quantity * contorni[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize].price;
+    			    	    } else if (choice <= antipastiSize + primiPiattiSize + secondiDiPesceSize + secondiDiCarneSize + contorniSize + dolciSize) {
+    			    	        fprintf(orderFile, "%s - %d x %.2lf EUR\n", dolci[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize].name, quantity, dolci[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize].price);
+    			    	        total += quantity * dolci[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize].price;
+    			    	    } else {
+    			    	        fprintf(orderFile, "%s - %d x %.2lf EUR\n", bibite[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize - dolciSize].name, quantity, bibite[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize - dolciSize].price);
+    			    	        total += quantity * bibite[choice - 1 - antipastiSize - primiPiattiSize - secondiDiPesceSize - secondiDiCarneSize - contorniSize - dolciSize].price;
+    			    	    }
+    			    	}
+    				} while (choice != 0);
+    				system("cls");
+    				fprintf(orderFile, "\nTotale: %.2lf EUR\n", total);
+    				printf("\t\t\t   -----------------------\n\t\t\t  /                       \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\|       ORDINAZIONI       |\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                       /\n\t\t\t   -----------------------\n\n\n\n");
+					printf("\n\nTOTALE: %.2lf EUR\n\n\n", total);
+    				fprintf(orderFile, "------------------------------------\n"); 
+    				fclose(orderFile);
+    				printf("Ordine effettuato con successo. Grazie per aver ordinato!\n");
+    				sleep(3);
+    				system("cls");
+					}
+				}
+				if(f==0){
+					goto start;
+				}
+			printf("\n\n\n\n\n)  Cliccare 1 per vedere lo storico dei ordini.\n\n)  Cliccare 0 per tornare alla pagina principale\n\n");
+			scanf("%d", &c);
+			if(c==0){
+				goto start;
+			}
+			if(c==1){
+				system("cls");
+				FILE *file = fopen("C:\\Users\\lenov\\Desktop\\ristorante\\ordini.txt", "r");
+    			if (file == NULL) {
+        			printf("Impossibile aprire il file.\n");
+        			return 1;
+    			}
+    			char buffer[100]; 
+    			while (fgets(buffer, 100, file) != NULL) {
+        			printf("%s", buffer); 
+    			}
+	   			fclose(file);
+				printf("\n\n\n\n\n)  Cliccare 0 per tornare alla pagina principale.\n\n");
+				scanf("%d", &c);
+				if(c==0){
+					goto start;
+				}
+			}
+		}
+	}
+	if(v==4){
+		for(i=0;i!=10000;i++){
+        	system("cls");
+            FILE *reviewFileRead = fopen("C:\\Users\\lenov\\Desktop\\ristorante\\recensione.txt", "r");
+            if (reviewFileRead == NULL) {
+                printf("Impossibile aprire il file delle recensioni.\n");
+                return 1;
+            }
+            char line[MAX_BUFFER];
+            while (fgets(line, MAX_BUFFER, reviewFileRead) != NULL) {
+                printf("%s", line);
+            }
+            fclose(reviewFileRead);
+            FILE *reviewFileAppend = fopen("C:\\Users\\lenov\\Desktop\\ristorante\\recensione.txt", "a");
+            if (reviewFileAppend == NULL) {
+                printf("Impossibile creare o aprire il file per la recensione.\n");
+                return 1;
+            }
+            printf("\n\n\n)  Cliccare 1 se si vuole scrivere una recensione.");
+            printf("\n\n)  Cliccare 0 per tornare alla pagina principale.\n\n\n");
+            scanf("%d", &c);
+			if(c==0){
+				goto start;
+			}
+			if(c==1){
+        	    printf("Per favore, inserisca il suo nome: ");
+        	    char nome[MAX_BUFFER];
+        	    getchar();
+        	    fgets(nome, MAX_BUFFER, stdin);
+        	    printf("Inserisca la sua recensione: ");
+        	    char recensione[MAX_BUFFER];
+        	    fgets(recensione, MAX_BUFFER, stdin);
+        	    fprintf(reviewFileAppend, "Utente: %sRecensione: %s\n----------------------------------------------------------------------------------\n", nome, recensione);
+        	    fclose(reviewFileAppend);
+        	    system("cls");
+        	    printf("La ringraziamo per il suo feedback.");
+        	    sleep(2);
+        	    continue;
+			}
+		}
+	}
+	if(v==5){
+		system("cls");
+		printf("\t\t\t   -------------------\n\t\t\t  /                   \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\|       CREDITI       |\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                   /\n\t\t\t   -------------------\n\n\n\n");
+		sleep(1);
+		printf("Progetto realizzato dal Team \"Carbonara con panna\":\n\n");
+		sleep(1);
+		printf("---------------\n| LUCA LANATA |----------> (Team Leader/Programmatore)\n---------------\n\n");
+		sleep(1);
+		printf("----------------\n| ANDREA SEMEC |----------> (Programmatore)\n----------------\n\n");
+		sleep(1);
+		printf("---------------\n| LUCA PARODI |----------> (Tester/Tecnico UML & GanttProject)\n---------------\n\n");
+		sleep(1);
+		printf("------------------\n| ANDREA TONELLI |----------> (Grafico)\n------------------\n\n");
+		sleep(1);
+		printf("\n\n\t\t\t------------------\n                       /                  \\\n                      /      |       |     \\\n                     /       |       |      \\\n                    /                        \\\n                    \\                        /\n                     \\     \\-----------/    /\n                      \\                    /\n                       \\                  /\n\t\t\t------------------\n");
+		sleep(1);
+		for(i=0;i<3;i++){
+			system("cls");
+			printf("\t\t\t   -------------------\n\t\t\t  /                   \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\|       CREDITI       |\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                   /\n\t\t\t   -------------------\n\n\n\n");
+			printf("Progetto realizzato dal Team \"Carbonara con panna\":\n\n");
+			printf("---------------\n| LUCA LANATA |----------> (Team Leader/Programmatore)\n---------------\n\n");
+			printf("----------------\n| ANDREA SEMEC |----------> (Programmatore)\n----------------\n\n");
+			printf("---------------\n| LUCA PARODI |----------> (Tester/Tecnico UML & GanttProject)\n---------------\n\n");
+			printf("------------------\n| ANDREA TONELLI |----------> (Grafico)\n------------------\n\n");
+			printf("\n\n\t\t\t------------------\n                       /                  \\\n                      /           |     |  \\\n                     /            |     |   \\\n                    /                        \\\n                    \\                        /\n                     \\     \\-----------/    /\n                      \\                    /\n                       \\                  /\n\t\t\t------------------\n");
+			sleep(1);
+			system("cls");
+			printf("\t\t\t   -------------------\n\t\t\t  /                   \\\n\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\|       CREDITI       |\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\\/\n\t\t\t  \\                   /\n\t\t\t   -------------------\n\n\n\n");
+			printf("Progetto realizzato dal Team \"Carbonara con panna\":\n\n");
+			printf("---------------\n| LUCA LANATA |----------> (Team Leader/Programmatore)\n---------------\n\n");
+			printf("----------------\n| ANDREA SEMEC |----------> (Programmatore)\n----------------\n\n");
+			printf("---------------\n| LUCA PARODI |----------> (Tester/Tecnico UML & GanttProject)\n---------------\n\n");
+			printf("------------------\n| ANDREA TONELLI |----------> (Grafico)\n------------------\n\n");
+			printf("\n\n\t\t\t------------------\n                       /                  \\\n                      /      |       |     \\\n                     /       |       |      \\\n                    /                        \\\n                    \\                        /\n                     \\     \\-----------/    /\n                      \\                    /\n                       \\                  /\n\t\t\t------------------\n");
+			sleep(1);
+		}
+		printf("\n\n)  Cliccare 0 per tornare alla pagina principale.\n");
+        	scanf("%d", &c);
+			if(c==0){
+				goto start;
+			}
+	}
+	if(v==6){
+		return 0;
+	}
+	goto start;
+}
